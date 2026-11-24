@@ -1,0 +1,94 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Tarea4: Verificar toda la tarea",
+      "type": "process",
+      "command": "python3",
+      "args": [
+        "${workspaceFolder}/ejecutar.py",
+        "pruebas"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "Tarea4: Abrir aplicación Tkinter",
+      "type": "process",
+      "command": "python3",
+      "args": [
+        "${workspaceFolder}/ejecutar.py",
+        "tkinter"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Tarea4: Abrir dashboard Streamlit",
+      "type": "process",
+      "command": "python3",
+      "args": [
+        "${workspaceFolder}/ejecutar.py",
+        "streamlit"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Tarea4: Compilar y abrir C++",
+      "type": "process",
+      "command": "python3",
+      "args": [
+        "${workspaceFolder}/ejecutar.py",
+        "cpp"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Tarea4: Abrir en MATLAB",
+      "type": "process",
+      "command": "python3",
+      "args": [
+        "${workspaceFolder}/ejecutar.py",
+        "matlab"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "dedicated"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

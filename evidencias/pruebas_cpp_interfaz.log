@@ -1,0 +1,2 @@
+This plugin does not support propagateSizeHints()
+PRUEBAS UI C++: escala sin FFT; rango sin SVD; dimensión recalcula; alertas y reset correctos.

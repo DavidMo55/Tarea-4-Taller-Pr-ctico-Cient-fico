@@ -1,0 +1,14 @@
+{
+  "comparacion_python_matlab_octave": "Correcta: FFT y oscilador dentro de tolerancia.",
+  "fft": {
+    "frecuencia_pico_hz": 440.0,
+    "amplitud_pico": 0.9999999999999998
+  },
+  "svd_python": {
+    "n": 100,
+    "k": 7,
+    "error_relativo_frobenius": 0.8765838267820706,
+    "reduccion_teorica_porcentaje": 85.92999999999999,
+    "bytes_arreglos_con_Ak": 320800
+  }
+}

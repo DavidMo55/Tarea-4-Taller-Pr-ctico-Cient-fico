@@ -1,0 +1,15 @@
+test_cache_fft_y_estado_atomico (__main__.ModeloTests.test_cache_fft_y_estado_atomico) ... ok
+test_cache_svd_y_error_atomico (__main__.ModeloTests.test_cache_svd_y_error_atomico) ... ok
+test_controlador_tk_restauracion_y_alerta (__main__.ModeloTests.test_controlador_tk_restauracion_y_alerta) ... Matplotlib is building the font cache; this may take a moment.
+ok
+test_dominio_oscilador (__main__.ModeloTests.test_dominio_oscilador) ... ok
+test_fft_amplitud_par_impar (__main__.ModeloTests.test_fft_amplitud_par_impar) ... ok
+test_nyquist_finito_memoria (__main__.ModeloTests.test_nyquist_finito_memoria) ... ok
+test_oscilador_condiciones_y_energia (__main__.ModeloTests.test_oscilador_condiciones_y_energia) ... ok
+test_svd_pura (__main__.ModeloTests.test_svd_pura) ... ok
+test_svd_reconstruccion_y_metricas (__main__.ModeloTests.test_svd_reconstruccion_y_metricas) ... ok
+
+----------------------------------------------------------------------
+Ran 9 tests in 23.156s
+
+OK

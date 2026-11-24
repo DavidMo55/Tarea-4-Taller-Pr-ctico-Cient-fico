@@ -1,0 +1,27 @@
+{
+  "sistema": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
+  "pruebas": [
+    {
+      "prueba": "python",
+      "exit_code": 0
+    },
+    {
+      "prueba": "streamlit",
+      "exit_code": 0
+    },
+    {
+      "prueba": "cpp_modelo",
+      "exit_code": 0
+    },
+    {
+      "prueba": "cpp_interfaz",
+      "exit_code": 0
+    },
+    {
+      "prueba": "modelos_matlab_en_octave",
+      "exit_code": 0
+    }
+  ],
+  "interfaz_matlab": "No ejecutada: MATLAB no está instalado.",
+  "interfaz_tk": "Controlador probado con Tcl y vista simulada; apertura nativa pendiente."
+}
