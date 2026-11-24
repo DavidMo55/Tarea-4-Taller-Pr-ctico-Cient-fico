@@ -1,3 +1,4 @@
+
 # Reporte de Tarea 4
 
 ## Objetivo y alcance
@@ -23,19 +24,24 @@ El controlador valida antes de confirmar un resultado nuevo. Una entrada inváli
 
 Se construye una señal de amplitud unitaria:
 
-\[
-y_j=\sin(2\pi f j/f_s),\qquad j=0,\ldots,N-1.
-\]
+$$
+y_j=\sin\left(2\pi f\frac{j}{f_s}\right),
+\qquad j=0,\ldots,N-1.
+$$
 
-El controlador exige valores finitos, frecuencia y duración positivas y **\(f_s>2f\)**. El valor inicial es \(f_s=10000\) Hz. Se limita la señal a un máximo de un millón de muestras para evitar asignaciones desproporcionadas.
+El controlador exige valores finitos, frecuencia y duración positivas y **$f_s>2f$**. El valor inicial es $f_s=10000$ Hz. Se limita la señal a un máximo de un millón de muestras para evitar asignaciones desproporcionadas.
 
-Después se calcula \(Y=\operatorname{FFT}(y)\). Para el espectro unilateral:
+Después se calcula $Y=\operatorname{FFT}(y)$. Para el espectro unilateral:
 
-\[
-f_k=kf_s/N,\qquad P_k=|Y_k|/N,\qquad 0\leq k\leq\lfloor N/2\rfloor.
-\]
+$$
+f_k=\frac{kf_s}{N},
+\qquad
+P_k=\frac{|Y_k|}{N},
+\qquad
+0\leq k\leq\left\lfloor\frac{N}{2}\right\rfloor.
+$$
 
-Se duplican las amplitudes positivas, excepto el término de Nyquist cuando \(N\) es par; DC nunca se duplica. Así se recupera la amplitud de una senoide cuyo número de ciclos coincide con la ventana de observación. Para frecuencias que no coinciden con un bin puede aparecer fuga espectral: no se aplica ventana adicional.
+Se duplican las amplitudes positivas, excepto el término de Nyquist cuando $N$ es par; DC nunca se duplica. Así se recupera la amplitud de una senoide cuyo número de ciclos coincide con la ventana de observación. Para frecuencias que no coinciden con un bin puede aparecer fuga espectral: no se aplica ventana adicional.
 
 En MATLAB, `VectorFrecuencias` y `MagnitudEspectro` son propiedades privadas. Cambiar entre escala lineal y semilogarítmica solamente dibuja esos arreglos. En escala logarítmica se omite la frecuencia cero porque su logaritmo no está definido. La ventana temporal inicial de hasta 20 ms facilita ver los ciclos; el análisis utiliza la señal completa.
 
@@ -45,24 +51,55 @@ En MATLAB, `VectorFrecuencias` y `MagnitudEspectro` son propiedades privadas. Ca
 
 El modelo implementado es el oscilador lineal libre amortiguado:
 
-\[
-x''+2\zeta\omega_n x'+\omega_n^2x=0,\quad
-\omega_n=2\pi f,\quad x(0)=x_0=1,\quad x'(0)=v_0.
-\]
+$$
+x''+2\zeta\omega_n x'+\omega_n^2x=0.
+$$
 
-Aunque el texto introductorio menciona sistemas no lineales, la ecuación del ejemplo corresponde a un sistema lineal. Se restringe a \(0<f\leq50\) Hz y \(0\leq\zeta<1\), tal como se solicita.
+Donde la frecuencia angular natural y las condiciones iniciales están dadas por:
 
-Definiendo \(a=\zeta\omega_n\) y \(\omega_d=\omega_n\sqrt{1-\zeta^2}\), la solución es:
+$$
+\omega_n=2\pi f,
+\qquad
+x(0)=x_0=1,
+\qquad
+x'(0)=v_0.
+$$
 
-\[
-x(t)=e^{-at}\left[x_0\cos(\omega_dt)+(v_0+ax_0)\frac{\sin(\omega_dt)}{\omega_d}\right],
-\]
+Aunque el texto introductorio menciona sistemas no lineales, la ecuación del ejemplo corresponde a un sistema lineal. Se restringe a $0<f\leq50$ Hz y $0\leq\zeta<1$, tal como se solicita.
 
-\[
-v(t)=e^{-at}\left[v_0\cos(\omega_dt)-(\omega_n^2x_0+av_0)\frac{\sin(\omega_dt)}{\omega_d}\right].
-\]
+Definiendo el coeficiente de amortiguamiento y la frecuencia angular amortiguada:
 
-Se usa una evaluación estable del cociente seno/frecuencia cerca del amortiguamiento crítico. Al sustituir \(t=0\), se obtiene exactamente \(x(0)=x_0\) y \(v(0)=v_0\). La función devuelve tres arreglos: tiempo, desplazamiento y velocidad. No estima la velocidad mediante diferencias finitas.
+$$
+a=\zeta\omega_n,
+\qquad
+\omega_d=\omega_n\sqrt{1-\zeta^2}.
+$$
+
+La solución para el desplazamiento es:
+
+$$
+x(t)=e^{-at}
+\left[
+x_0\cos(\omega_dt)
++
+(v_0+ax_0)
+\frac{\sin(\omega_dt)}{\omega_d}
+\right].
+$$
+
+La solución para la velocidad es:
+
+$$
+v(t)=e^{-at}
+\left[
+v_0\cos(\omega_dt)
+-
+(\omega_n^2x_0+av_0)
+\frac{\sin(\omega_dt)}{\omega_d}
+\right].
+$$
+
+Se usa una evaluación estable del cociente seno/frecuencia cerca del amortiguamiento crítico. Al sustituir $t=0$, se obtiene exactamente $x(0)=x_0$ y $v(0)=v_0$. La función devuelve tres arreglos: tiempo, desplazamiento y velocidad. No estima la velocidad mediante diferencias finitas.
 
 Tkinter vincula la velocidad inicial con una `DoubleVar` y un `ttk.Entry`. El botón de restablecimiento modifica las variables con `.set()` y vuelve a dibujar. Los subgráficos `121` y `122` muestran desplazamiento contra tiempo y velocidad contra desplazamiento. Los valores fuera del dominio producen `messagebox.showwarning`.
 
@@ -76,29 +113,81 @@ El modelo genera una matriz gaussiana cuadrada con un generador local de semilla
 
 Se factoriza una sola vez por cambio de dimensión:
 
-\[
+$$
 A=U\Sigma V^T.
-\]
+$$
 
-En Python se utiliza `np.linalg.svd(A, full_matrices=False)`. El controlador conserva los factores en `st.session_state` y muestra `st.spinner` durante la factorización. Para \(1\leq k\leq\lfloor n/10\rfloor\), se reconstruye:
+En Python se utiliza `np.linalg.svd(A, full_matrices=False)`. El controlador conserva los factores en `st.session_state` y muestra `st.spinner` durante la factorización.
 
-\[
-A_k=U_{:,:k}\operatorname{diag}(\sigma_{:k})V^T_{:k,:}.
-\]
+Para un rango de reconstrucción dentro del intervalo:
+
+$$
+1\leq k\leq\left\lfloor\frac{n}{10}\right\rfloor,
+$$
+
+se reconstruye la matriz mediante:
+
+$$
+A_k=
+U_{:,:k}
+\operatorname{diag}(\sigma_{:k})
+V^T_{:k,:}.
+$$
+
+De manera equivalente, la aproximación de rango $k$ puede expresarse como:
+
+$$
+A_k=\sum_{i=1}^{k}\sigma_i u_i v_i^T.
+$$
 
 Mover el deslizador cambia la reconstrucción, su error y la gráfica, pero no vuelve a ejecutar SVD. El estado guarda la dimensión actual; no acumula matrices de todas las dimensiones visitadas. Las opciones de interfaz son 100, 250, 500 y 1000.
 
-Las tres métricas son:
+Las tres métricas utilizadas son las siguientes.
 
-\[
-E=\frac{\|A-A_k\|_F}{\|A\|_F},\qquad
-R=100\left(1-\frac{2nk+k}{n^2}\right),\qquad
+### Error relativo de reconstrucción
+
+$$
+E=\frac{\left\|A-A_k\right\|_F}
+{\left\|A\right\|_F}.
+$$
+
+Donde $\|\cdot\|_F$ representa la norma de Frobenius.
+
+### Porcentaje de reducción de almacenamiento
+
+$$
+R=100\left(1-\frac{2nk+k}{n^2}\right).
+$$
+
+### Contador de factorizaciones
+
+$$
 C=\text{número de factorizaciones completadas}.
-\]
+$$
 
-**La reducción R corresponde al almacenamiento de los factores truncados**, no a una medición de RAM liberada por la aplicación. Una matriz original requiere \(n^2\) números; los factores truncados requieren \(nk+k+kn\). Para poder interactuar se mantienen la matriz y los factores completos en RAM. Contando además una reconstrucción completa y datos `float64`, sus arreglos suman aproximadamente \(8(4n^2+n)\) bytes, sin contar temporales, objetos ni espacio de trabajo de las bibliotecas. No es memoria total del proceso.
+**La reducción $R$ corresponde al almacenamiento de los factores truncados**, no a una medición de RAM liberada por la aplicación.
 
-La gráfica utiliza escala logarítmica vertical para los valores singulares y una línea discontinua en el índice k. Una matriz gaussiana densa suele tener rango completo: reducir mucho el almacenamiento puede dejar un error grande. Eso es un resultado esperado, no un fallo del algoritmo.
+Una matriz original requiere:
+
+$$
+N_{\text{original}}=n^2.
+$$
+
+Mientras que los factores truncados requieren:
+
+$$
+N_{\text{truncado}}=nk+k+kn=2nk+k.
+$$
+
+Para poder interactuar se mantienen la matriz y los factores completos en RAM. Contando además una reconstrucción completa y datos `float64`, sus arreglos suman aproximadamente:
+
+$$
+M=8(4n^2+n)\quad\text{bytes}.
+$$
+
+Este cálculo no incluye temporales, objetos ni espacio de trabajo de las bibliotecas. No representa la memoria total del proceso.
+
+La gráfica utiliza escala logarítmica vertical para los valores singulares y una línea discontinua en el índice $k$. Una matriz gaussiana densa suele tener rango completo: reducir mucho el almacenamiento puede dejar un error grande. Eso es un resultado esperado, no un fallo del algoritmo.
 
 ![Modelo SVD](evidencias/modelo_svd.png)
 
@@ -116,6 +205,32 @@ La gráfica utiliza escala logarítmica vertical para los valores singulares y u
 
 La tabla reúne mediciones del archivo `evidencias/resultados_numericos.json`. La coincidencia del pico valida la FFT. La combinación de ahorro alto y error alto muestra el compromiso de comprimir una matriz sin estructura marcada. Los resultados de error SVD de C++ pueden diferir porque su matriz aleatoria es distinta; la fórmula de almacenamiento sí coincide.
 
+Para el caso de una matriz de dimensión $n=100$ y rango de reconstrucción $k=7$, el número de elementos originales es:
+
+$$
+N_{\text{original}}=100^2=10000.
+$$
+
+El número de elementos almacenados mediante los factores truncados es:
+
+$$
+N_{\text{truncado}}=2(100)(7)+7=1407.
+$$
+
+Por lo tanto, el porcentaje de reducción de almacenamiento es:
+
+$$
+R=100\left(1-\frac{1407}{10000}\right)
+=85.93\%.
+$$
+
+La memoria correspondiente a los arreglos completos de la sesión es:
+
+$$
+M=8\left(4(100)^2+100\right)
+=320800\quad\text{bytes}.
+$$
+
 ### Auditoría de la caché en Streamlit
 
 | Ejecución de la aplicación | Dimensión n | Rango k | Contador de SVD |
@@ -126,7 +241,7 @@ La tabla reúne mediciones del archivo `evidencias/resultados_numericos.json`. L
 | 4: cambio de rango | 250 | 25 | 2 |
 | 5: regreso a dimensión anterior | 100 | 1 | 3 |
 
-Esta tabla reproduce los cinco ciclos comprobados con `AppTest`. Las filas 2 y 4 demuestran reutilización de los mismos factores al mover k. La fila 5 demuestra que se conserva solamente la dimensión actual; volver a una dimensión anterior calcula una nueva factorización.
+Esta tabla reproduce los cinco ciclos comprobados con `AppTest`. Las filas 2 y 4 demuestran reutilización de los mismos factores al mover $k$. La fila 5 demuestra que se conserva solamente la dimensión actual; volver a una dimensión anterior calcula una nueva factorización.
 
 ### Verificación ejecutada y límites
 
@@ -147,20 +262,40 @@ La tabla separa la validación matemática de la interfaz. Probar funciones `.m`
 
 Estas imágenes se obtuvieron renderizando los componentes reales de Qt con el backend `offscreen`:
 
+#### Interfaz de análisis espectral FFT
+
 ![Interfaz FFT C++](evidencias/cpp_fft.png)
 
+#### Interfaz del oscilador amortiguado
+
 ![Interfaz oscilador C++](evidencias/cpp_oscilador.png)
+
+#### Interfaz de aproximación matricial SVD
 
 ![Interfaz SVD C++](evidencias/cpp_svd.png)
 
 ## 6. Reproducción y cierre
 
-Las instrucciones completas están en [README.md](README.md). `python3 ejecutar.py pruebas` compila cuando es necesario, ejecuta las verificaciones y genera las evidencias. `python3 ejecutar.py evidencias` regenera las gráficas usando los datos exportados.
+Las instrucciones completas están en [README.md](README.md).
 
-La optimización central consiste en conservar la FFT cuando solo cambia su escala y conservar la SVD cuando solo cambia el rango. Las validaciones evitan actualizar el estado con datos inválidos, y los modelos separados permiten comprobar fórmulas sin depender de una ventana gráfica. Queda por verificar manualmente la ventana Tkinter en una sesión gráfica y la interfaz MATLAB en una instalación de MATLAB.
+Para compilar cuando sea necesario, ejecutar las verificaciones y generar las evidencias:
+
+```bash
+python3 ejecutar.py pruebas
+```
+
+Para regenerar las gráficas usando los datos exportados:
+
+```bash
+python3 ejecutar.py evidencias
+```
+
+La optimización central consiste en conservar la FFT cuando solo cambia su escala y conservar la SVD cuando solo cambia el rango. Las validaciones evitan actualizar el estado con datos inválidos, y los modelos separados permiten comprobar fórmulas sin depender de una ventana gráfica.
+
+Queda por verificar manualmente la ventana Tkinter en una sesión gráfica y la interfaz MATLAB en una instalación de MATLAB.
 
 ## Referencias técnicas
 
-- [MathWorks: fft y espectro unilateral](https://www.mathworks.com/help/matlab/ref/fft.html).
+- [MathWorks: FFT y espectro unilateral](https://www.mathworks.com/help/matlab/ref/fft.html).
 - [Streamlit: AppTest para pruebas de aplicaciones](https://docs.streamlit.io/develop/api-reference/app-testing/st.testing.v1.apptest).
 - Material base: cinco cuadernos Semana 3 proporcionados por el usuario y planteamiento de Tarea 4.
