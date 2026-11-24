@@ -31,7 +31,7 @@ $$
 
 El controlador exige valores finitos, frecuencia y duración positivas y **$f_s>2f$**. El valor inicial es $f_s=10000$ Hz. Se limita la señal a un máximo de un millón de muestras para evitar asignaciones desproporcionadas.
 
-Después se calcula $Y=\operatorname{FFT}(y)$. Para el espectro unilateral:
+Después se calcula $Y=\mathrm{FFT}(y)$. Para el espectro unilateral:
 
 $$
 f_k=\frac{kf_s}{N},
@@ -130,7 +130,7 @@ se reconstruye la matriz mediante:
 $$
 A_k=
 U_{:,:k}
-\operatorname{diag}(\sigma_{:k})
+\mathrm{diag}(\sigma_{:k})
 V^T_{:k,:}.
 $$
 
