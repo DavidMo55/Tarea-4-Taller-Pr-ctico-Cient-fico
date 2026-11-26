@@ -299,3 +299,51 @@ Queda por verificar manualmente la ventana Tkinter en una sesión gráfica y la 
 - [MathWorks: FFT y espectro unilateral](https://www.mathworks.com/help/matlab/ref/fft.html).
 - [Streamlit: AppTest para pruebas de aplicaciones](https://docs.streamlit.io/develop/api-reference/app-testing/st.testing.v1.apptest).
 - Material base: cinco cuadernos Semana 3 proporcionados por el usuario y planteamiento de Tarea 4.
+
+## Justificación del uso de Inteligencia Artificial
+
+El desarrollo del presente proyecto incorporó herramientas de inteligencia artificial generativa como apoyo técnico y metodológico para proponer código, organizar las interfaces y preparar procedimientos de compilación, depuración y verificación en Python, MATLAB y C++. Su utilización tuvo como finalidad agilizar el desarrollo y facilitar la adaptación de los ejemplos a los requerimientos de la actividad. La responsabilidad de revisar, comprender y aceptar el código permanece en quien presenta el proyecto.
+
+Las propuestas se contrastaron con las ecuaciones, las restricciones físicas y los resultados de las pruebas disponibles. Esta revisión permitió comprobar las condiciones iniciales del oscilador, la normalización de la FFT, la reconstrucción mediante SVD y la reutilización de los resultados almacenados. No se midió el tiempo de desarrollo con y sin IA, por lo que no se atribuye una reducción cuantitativa de tiempos a su uso.
+
+### Fragmentos de interfaz asistidos por IA generativa
+
+| Entorno y archivos | Asistencia utilizada |
+|---|---|
+| Tkinter: `python/vista_tk.py` y `python/controlador_tk.py` | Organización de pestañas y controles mediante `grid`, vinculación con `DoubleVar`, integración de `FigureCanvasTkAgg`, gráficas temporal y de fase, advertencias y callback de restablecimiento. También se asistió la coordinación del trabajador de FFT con el hilo gráfico. |
+| Streamlit: `python/vista_streamlit.py` y `python/app_streamlit.py` | Selector de dimensión, deslizador de rango, tres métricas, gráfica semilogarítmica, indicador de espera y coordinación del estado de sesión para no repetir la SVD al cambiar k. |
+| MATLAB: `matlab/JerarquiaPOO.m` | Construcción programática de `uifigure`, `uigridlayout`, pestañas, `uiaxes`, campos numéricos, alertas y diálogos de progreso; propiedades privadas para conservar resultados y callbacks para redibujarlos. |
+| C++/Qt: `cpp/view.hpp`, `cpp/controller.hpp` y `cpp/main.cpp` | Distribución de controles y pestañas, renderizado de curvas, tarjetas de métricas, mensajes de advertencia, reinicio y coordinación de cálculos en segundo plano con la actualización de la interfaz. |
+
+La asistencia no se limitó a cambios estéticos: también intervino en propuestas de modelos numéricos, manejo del estado, pruebas y documentación. Las capturas incluidas corresponden a componentes reales de C++/Qt renderizados en modo sin pantalla; no acreditan por sí mismas una prueba manual de todas las interfaces.
+
+### Revisión de la separación entre Vista y Modelo
+
+La inspección del código comprobó que `python/modelo.py` no importa Tkinter ni Streamlit, y que `cpp/models.hpp` no depende de Qt. Las funciones numéricas independientes de MATLAB no requieren componentes gráficos. El método privado `calcularEspectroFFT(app)` lee la señal y devuelve los resultados sin realizar llamadas gráficas.
+
+En sentido inverso, las vistas reciben datos para representarlos: no ejecutan la FFT ni la factorización SVD. El controlador coordina los eventos, solicita cálculos y actualiza la vista. Cambiar la escala reutiliza el espectro almacenado; cambiar k reutiliza los factores de la dimensión actual. Estas transiciones se comprobaron mediante pruebas de estado, AppTest y eventos de la interfaz Qt.
+
+La separación es funcional, no una ausencia absoluta de dependencias: la vista conoce la estructura de los datos que representa. Además, `JerarquiaPOO.m` reúne responsabilidades de vista y controlador y contiene el método numérico privado exigido por el planteamiento. Por tanto, se verificó la independencia del cálculo respecto de los componentes gráficos, sin afirmar un desacoplamiento total entre todos los objetos de la aplicación.
+
+### Revisión de memoria y alcance de la verificación
+
+La inspección identificó los siguientes mecanismos de gestión de recursos:
+
+- Las cachés conservan el resultado de la configuración actual y reemplazan el anterior; no mantienen un historial de matrices por cada movimiento de los controles.
+- Tkinter reutiliza los lienzos y sus ejes. Al cerrar, solicita la cancelación de trabajos pendientes y destruye la ventana; un trabajo que ya esté ejecutándose puede terminar después de esa solicitud.
+- Streamlit crea figuras mediante `matplotlib.figure.Figure`, sin registrarlas mediante `pyplot.figure`. Su liberación efectiva depende de las referencias existentes y del recolector de memoria; este diseño no demuestra por sí solo ausencia de fugas.
+- Qt utiliza la jerarquía de propiedad de los widgets incorporados a contenedores y layouts. Los arreglos y factores emplean contenedores con gestión automática de recursos. Los vectores de dibujo se reemplazan y pueden conservar capacidad reservada para reutilizarla.
+- MATLAB define la destrucción de la ventana y el cierre de los diálogos de progreso. Esta lógica se revisó en el código, pero no se ejecutó la interfaz en MATLAB.
+
+**No se dispone de una medición manual documentada ni de un perfil de memoria que permita afirmar que no existen fugas.** Las pruebas realizadas verifican resultados, contadores de cálculo, validaciones y restablecimiento; no sustituyen una prueba prolongada del consumo de memoria. Asimismo, las funciones MATLAB se probaron con GNU Octave, mientras que la interfaz MATLAB y la apertura nativa de Tkinter siguen pendientes de validación en sus entornos gráficos.
+
+Para completar la comprobación manual, se propone el siguiente protocolo, que debe registrarse como pendiente hasta ejecutarlo:
+
+1. Abrir cada aplicación en su entorno gráfico y registrar versiones, parámetros y memoria del proceso después del calentamiento inicial.
+2. Repetir al menos 100 cambios de escala con una señal fija, verificando que el contador de FFT no aumente.
+3. Alternar k con n fijo y después alternar dimensiones entre 100 y 250. Registrar memoria y contadores tras cada bloque, regresando a la misma configuración para que la comparación sea válida.
+4. Repetir entradas inválidas, restablecimientos y apertura/cierre de ventanas. En Streamlit, comprobar también la liberación de sesiones. Buscar crecimiento acumulativo reproducible después de estabilizar el uso y finalizar las tareas.
+5. Si aparece crecimiento persistente, investigar las asignaciones retenidas con un perfilador adecuado antes de atribuirlo a una fuga. La memoria reservada por bibliotecas o asignadores puede permanecer disponible para reutilización aunque los objetos ya no estén activos.
+6. Revisar el flujo de llamadas desde cada control: debe pasar por el controlador, y los modelos deben continuar ejecutándose sin crear ventanas. Registrar capturas, mediciones y resultados de esta revisión.
+
+La IA se utilizó como apoyo para construir y comprobar la solución; la conclusión técnica se limita a las evidencias disponibles. La independencia del cálculo y el comportamiento de la caché cuentan con revisión de código y pruebas, mientras que la ausencia de fugas de memoria requiere completar el protocolo descrito.
